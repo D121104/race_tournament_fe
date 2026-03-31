@@ -1,27 +1,34 @@
 // src/components/forms/UserForm.tsx
 "use client";
 import { Form, Button, Input } from "antd";
+import { useEffect } from "react";
 
 interface RaceFormProps {
-  initialValues?: any;
+  initialData?: any;
   onSubmit: (values: any) => void;
   isLoading?: boolean;
   mode: "create" | "edit";
 }
 
 export default function RaceForm({
-  initialValues,
+  initialData,
   onSubmit,
   isLoading,
   mode,
 }: RaceFormProps) {
   const [form] = Form.useForm();
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      form.setFieldsValue(initialData);
+    } else {
+      form.resetFields(); // Xóa trắng form nếu là chế độ tạo mới
+    }
+  }, [initialData, form, mode]);
 
   return (
     <Form
       form={form}
       layout="vertical"
-      initialValues={initialValues}
       onFinish={onSubmit}
     >
       <Form.Item
@@ -29,7 +36,7 @@ export default function RaceForm({
         label="Tên chặng đua"
         rules={[{ required: true }]}
       >
-        <Input disabled={mode === "edit"} />{" "}
+        <Input/>{" "}
         {/* Edit thì không cho sửa username */}
       </Form.Item>
 
