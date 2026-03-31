@@ -4,7 +4,7 @@ import { Result, Button } from "antd";
 import { useRouter } from "next/navigation";
 import { ToolOutlined } from "@ant-design/icons";
 
-export default function TournamentPage() {
+export default function SeasonPage() {
   const router = useRouter();
 
   return (
@@ -17,7 +17,7 @@ export default function TournamentPage() {
       <Result
         icon={<ToolOutlined style={{ color: '#1890ff' }} />}
         title="Tính năng đang phát triển"
-        subTitle="Chức năng Quản lý giải đua đang được xây dựng. Vui lòng quay lại sau!"
+        subTitle="Chức năng Quản lý mùa giải đang được xây dựng. Vui lòng quay lại sau!"
         extra={[
           <Button 
             type="primary" 

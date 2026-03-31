@@ -1,179 +1,222 @@
-import React, { useState } from "react";
-import { Flex, Space, Table, Button } from "antd";
+import React, { useState, useEffect } from "react";
+import { Flex, Space, Table, Button, message, Modal } from "antd";
 import type { TableProps } from "antd";
 import Card from "antd/es/card/Card";
-import style from "antd/es/_util/wave/style";
 import RaceModal from "./RaceModal";
-import { on } from "events";
+import { Race } from "@/types/race";
+import { Season } from "@/types/season";
+import { Tournament } from "@/types/tournament";
 
-interface DataType {
+interface DataType extends Race {
   key: number;
-  id: number;
-  raceName: string;
-  description: string;
-  location: string;
-  date: string;
-  length: number;
-  numberOfLaps: number;
+  tournamentName?: string;
+  seasonName?: string;
 }
-
-
-const data: DataType[] = [
-  {
-    key: 1,
-    id: 1,
-    raceName: "Italian Grand Prix",
-    description:
-      "Thánh đường tốc độ với những đoạn thẳng dài và góc cua huyền thoại.",
-    location: "Autodromo Nazionale Monza, Italy",
-    date: "2026-09-06",
-    length: 5.793,
-    numberOfLaps: 53,
-  },
-  {
-    key: 2,
-    id: 2,
-    raceName: "Singapore Grand Prix",
-    description:
-      "Chặng đua đêm đầy thử thách dưới ánh đèn rực rỡ của vịnh Marina.",
-    location: "Marina Bay Street Circuit, Singapore",
-    date: "2026-09-20",
-    length: 4.94,
-    numberOfLaps: 62,
-  },
-  {
-    key: 3,
-    id: 3,
-    raceName: "Japanese Grand Prix",
-    description:
-      "Đường đua duy nhất có cấu trúc hình số 8, đòi hỏi kỹ thuật cực cao.",
-    location: "Suzuka International Racing Course, Japan",
-    date: "2026-10-11",
-    length: 5.807,
-    numberOfLaps: 53,
-  },
-  {
-    key: 5,
-    id: 5,
-    raceName: "Belgian Grand Prix",
-    description:
-      "Đường đua xuyên qua rừng Ardennes với góc cua Eau Rouge nổi tiếng.",
-    location: "Circuit de Spa-Francorchamps, Belgium",
-    date: "2026-08-30",
-    length: 7.004,
-    numberOfLaps: 44,
-  },
-  {
-    key: 6,
-
-    id: 6,
-    raceName: "Monaco Grand Prix",
-    description: "Chặng đua huyền thoại qua các con phố của Monte Carlo.",
-    location: "Circuit de Monaco",
-    date: "2026-05-24",
-    length: 3.337,
-    numberOfLaps: 78,
-  },
-  {
-    key: 7,
-    id: 7,
-    raceName: "Monaco Grand Prix",
-    description: "Chặng đua huyền thoại qua các con phố của Monte Carlo.",
-    location: "Circuit de Monaco",
-    date: "2026-05-24",
-    length: 3.337,
-    numberOfLaps: 78,
-  },
-];
 
 interface ModalConfig {
   open: boolean;
-  data: DataType | null;
-  mode: "create" | "edit";
+  data: Race | null;
+  mode: "create" | "edit" | "view";
 }
 
-export default function RaceTable() {
-  const [modalConfig, setModalConfig] = useState<ModalConfig>({ open: false, data: null, mode: "create" });
+interface RaceTableProps {
+  races: Race[];
+  loading: boolean;
+  onCreateRace: (values: any) => Promise<void>;
+  onUpdateRace: (id: number, values: any) => Promise<void>;
+  onDeleteRace: (id: number) => Promise<void>;
+  seasons: Season[];
+  tournaments: Tournament[];
+  canCreate: boolean; // Thêm prop để control nút tạo mới
+}
+
+export default function RaceTable({
+  races,
+  loading,
+  onCreateRace,
+  onUpdateRace,
+  onDeleteRace,
+  seasons,
+  tournaments,
+  canCreate,
+}: RaceTableProps) {
+  const [modalConfig, setModalConfig] = useState<ModalConfig>({ 
+    open: false, 
+    data: null, 
+    mode: "create" 
+  });
+  const [submitting, setSubmitting] = useState(false);
+
+  // Tạo data với thông tin tournament và season
+  const dataSource: DataType[] = races.map((race) => {
+    const season = seasons.find(s => s.id === race.seasonId);
+    const tournament = season ? tournaments.find(t => t.id === season.tournamentId) : null;
+    
+    return {
+      ...race,
+      key: race.id,
+      seasonName: season?.seasonName ?? '-', // ✅ Default value
+      tournamentName: tournament?.tournamentName ?? '-', // ✅ Default value
+    };
+  });
+
   const onClickCreate = () => {
+    if (!canCreate) {
+      message.warning('Vui lòng chọn giải đua và mùa giải trước khi tạo chặng đua');
+      return;
+    }
     setModalConfig({ open: true, data: null, mode: "create" });
-  }
+  };
+
   const onClickEdit = (record: DataType) => {
     setModalConfig({ open: true, data: record, mode: "edit" });
-  }
+  };
+
+  const onClickView = (record: DataType) => {
+    setModalConfig({ open: true, data: record, mode: "view" });
+  };
+
+  const handleDelete = (record: DataType) => {
+    Modal.confirm({
+      title: 'Xác nhận xóa',
+      content: `Bạn có chắc chắn muốn xóa chặng đua "${record.raceName}"?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await onDeleteRace(record.id);
+          // Message được handle ở page.tsx
+        } catch (error) {
+          // Error message được handle ở page.tsx
+          console.error('Delete error:', error);
+        }
+      },
+    });
+  };
+
+  const handleSubmit = async (values: any) => {
+    setSubmitting(true);
+    try {
+      if (modalConfig.mode === "create") {
+        await onCreateRace(values);
+        // Message được handle ở page.tsx
+      } else if (modalConfig.data) {
+        await onUpdateRace(modalConfig.data.id, values);
+        // Message được handle ở page.tsx
+      }
+      setModalConfig({ ...modalConfig, open: false });
+    } catch (error) {
+      // Error message được handle ở page.tsx
+      console.error('Submit error:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const columns: TableProps<DataType>["columns"] = [
-  {
-    title: "Tên chặng đua",
-    dataIndex: "raceName",
-    key: "raceName",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Mô tả",
-    dataIndex: "description",
-    key: "description",
-  },
-  {
-    title: "Địa điểm",
-    dataIndex: "location",
-    key: "location",
-  },
-  {
-    title: "Ngày tổ chức",
-    dataIndex: "date",
-    key: "date",
-  },
-  {
-    title: "Độ dài (km)",
-    dataIndex: "length",
-    key: "length",
-  },
-  {
-    title: "Số vòng đua",
-    dataIndex: "numberOfLaps",
-    key: "numberOfLaps",
-  },
-  {
-    title: "Thao tác",
-    key: "action",
-    render: (_, record) => (
-      <Space size="medium">
-        <Button color="primary" variant="solid" onClick={() => onClickEdit(record)}>
-          {" "}
-          Sửa{" "}
-        </Button>
-        <Button color="danger" variant="solid">
-          {" "}
-          Xóa{" "}
-        </Button>
-      </Space>
-    ),
-  },
-];
+    {
+      title: "Giải đua",
+      dataIndex: "tournamentName",
+      key: "tournamentName",
+      render: (text) => text || '-',
+    },
+    {
+      title: "Mùa giải",
+      dataIndex: "seasonName",
+      key: "seasonName",
+      render: (text) => text || '-',
+    },
+    {
+      title: "Tên chặng đua",
+      dataIndex: "raceName",
+      key: "raceName",
+      render: (text) => <a>{text}</a>,
+    },
+    {
+      title: "Địa điểm",
+      dataIndex: "location",
+      key: "location",
+    },
+    {
+      title: "Ngày tổ chức",
+      dataIndex: "date",
+      key: "date",
+    },
+    {
+      title: "Độ dài (km)",
+      dataIndex: "length",
+      key: "length",
+      render: (value) => value?.toFixed(2),
+    },
+    {
+      title: "Số vòng",
+      dataIndex: "numberOfLaps",
+      key: "numberOfLaps",
+    },
+    {
+      title: "Thao tác",
+      key: "action",
+      render: (_, record) => (
+        <Space size="small">
+          <Button 
+            color="default" 
+            variant="solid" 
+            onClick={() => onClickView(record)}
+          >
+            Xem
+          </Button>
+          <Button 
+            color="primary" 
+            variant="solid" 
+            onClick={() => onClickEdit(record)}
+          >
+            Sửa
+          </Button>
+          <Button 
+            color="danger" 
+            variant="solid"
+            onClick={() => handleDelete(record)}
+          >
+            Xóa
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <Card
       title="Danh sách chặng đua"
       style={{ width: "100%" }}
       extra={
-        <a href="#">
-          <Button color="cyan" variant="solid" onClick={onClickCreate}>
-            Tạo chặng đua mới
-          </Button>
-        </a>
+        <Button 
+          color="cyan" 
+          variant="solid" 
+          onClick={onClickCreate}
+          disabled={!canCreate}
+        >
+          Tạo chặng đua mới
+        </Button>
       }
     >
-      <Table<DataType> columns={columns} dataSource={data} />;
+      <Table<DataType> 
+        columns={columns} 
+        dataSource={dataSource}
+        loading={loading}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          showTotal: (total) => `Tổng ${total} chặng đua`,
+        }}
+      />
       <RaceModal 
         open={modalConfig.open} 
         initialData={modalConfig.data} 
         onClose={() => setModalConfig({ ...modalConfig, open: false })}
-        onSubmit={(values) => {
-          console.log(values);
-          setModalConfig({ ...modalConfig, open: false });
-        }}
+        onSubmit={handleSubmit}
         mode={modalConfig.mode}
-
+        isLoading={submitting}
       />
     </Card>
   );
