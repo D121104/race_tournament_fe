@@ -7,9 +7,13 @@ import {
   TrophyOutlined,
   CalendarOutlined,
   FlagOutlined,
+  BarChartOutlined,
+  DollarOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 import { useRouter, usePathname } from "next/navigation";
+import { authService } from "@/services/authService";
 
 const { Header, Sider, Content } = Layout;
 
@@ -25,11 +29,13 @@ export default function MainLayout({
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  // Xác định key dựa trên pathname hiện tại
+
   const getSelectedKey = () => {
     if (pathname?.includes('/dashboard/tournament')) return '1';
     if (pathname?.includes('/dashboard/season')) return '2';
+    if (pathname?.includes('/dashboard/race-result')) return '4';
     if (pathname?.includes('/dashboard/race')) return '3';
+    if (pathname?.includes('/dashboard/sponsor')) return '5';
     return '1';
   };
 
@@ -43,6 +49,12 @@ export default function MainLayout({
         break;
       case '3':
         router.push('/dashboard/race');
+        break;
+      case '4':
+        router.push('/dashboard/race-result');
+        break;
+      case '5':
+        router.push('/dashboard/sponsor');
         break;
       default:
         router.push('/dashboard');
@@ -74,11 +86,21 @@ export default function MainLayout({
               icon: <FlagOutlined />,
               label: "Quản lý chặng đua",
             },
+            {
+              key: "4",
+              icon: <BarChartOutlined />,
+              label: "Kết quả chặng đua",
+            },
+            {
+              key: "5",
+              icon: <DollarOutlined />,
+              label: "Nhà tài trợ & Hợp đồng",
+            },
           ]}
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: 0, background: colorBgContainer }}>
+        <Header style={{ padding: "0 16px", background: colorBgContainer, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -89,6 +111,17 @@ export default function MainLayout({
               height: 64,
             }}
           />
+          <Button
+            type="text"
+            danger
+            icon={<LogoutOutlined />}
+            onClick={() => {
+              authService.logout();
+              router.push("/login");
+            }}
+          >
+            Đăng xuất
+          </Button>
         </Header>
         <Content
           style={{
@@ -105,3 +138,4 @@ export default function MainLayout({
     </Layout>
   );
 }
+

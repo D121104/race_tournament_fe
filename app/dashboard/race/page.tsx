@@ -110,13 +110,13 @@ export default function RacePage() {
       setSeasons(data);
       
       // Reset selectedSeasonId khi đổi tournament
-      setSelectedSeasonId(null);
+      setSelectedSeasonId(undefined);
     } catch (error) {
       setError('Không thể tải danh sách mùa giải');
       message.error('Không thể tải danh sách mùa giải');
       console.error('Error loading seasons:', error);
       setSeasons([]);
-      setSelectedSeasonId(null);
+      setSelectedSeasonId(undefined);
     } finally {
       setLoading(false); // ✅ Thêm finally block
     }
