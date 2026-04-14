@@ -7,10 +7,10 @@ export default function NotFound() {
   const router = useRouter();
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
       minHeight: '100vh',
       backgroundColor: '#f0f2f5'
     }}>
@@ -19,12 +19,12 @@ export default function NotFound() {
         title="404"
         subTitle="Xin lỗi, trang bạn tìm kiếm không tồn tại."
         extra={[
-          <Button 
-            type="primary" 
-            key="home" 
-            onClick={() => router.push('/dashboard/race')}
+          <Button
+            type="primary"
+            key="home"
+            onClick={() => router.push('/dashboard/race-result')}
           >
-            Về trang quản lý chặng đua
+            Về trang dashboard
           </Button>,
         ]}
       />

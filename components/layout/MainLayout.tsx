@@ -31,29 +31,17 @@ export default function MainLayout({
 
 
   const getSelectedKey = () => {
-    if (pathname?.includes('/dashboard/tournament')) return '1';
-    if (pathname?.includes('/dashboard/season')) return '2';
-    if (pathname?.includes('/dashboard/race-result')) return '4';
-    if (pathname?.includes('/dashboard/race')) return '3';
-    if (pathname?.includes('/dashboard/sponsor')) return '5';
+    if (pathname?.includes('/dashboard/race-result')) return '1';
+    if (pathname?.includes('/dashboard/sponsor')) return '2';
     return '1';
   };
 
   const handleMenuClick = (key: string) => {
     switch (key) {
       case '1':
-        router.push('/dashboard/tournament');
-        break;
-      case '2':
-        router.push('/dashboard/season');
-        break;
-      case '3':
-        router.push('/dashboard/race');
-        break;
-      case '4':
         router.push('/dashboard/race-result');
         break;
-      case '5':
+      case '2':
         router.push('/dashboard/sponsor');
         break;
       default:
@@ -73,26 +61,11 @@ export default function MainLayout({
           items={[
             {
               key: "1",
-              icon: <TrophyOutlined />,
-              label: "Quản lý Giải đua",
-            },
-            {
-              key: "2",
-              icon: <CalendarOutlined />,
-              label: "Quản lý mùa giải",
-            },
-            {
-              key: "3",
-              icon: <FlagOutlined />,
-              label: "Quản lý chặng đua",
-            },
-            {
-              key: "4",
               icon: <BarChartOutlined />,
               label: "Kết quả chặng đua",
             },
             {
-              key: "5",
+              key: "2",
               icon: <DollarOutlined />,
               label: "Nhà tài trợ & Hợp đồng",
             },

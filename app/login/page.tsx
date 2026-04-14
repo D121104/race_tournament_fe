@@ -35,7 +35,7 @@ export default function LoginPage() {
       const user = await authService.signUp(values);
       authService.saveAuth(user);
       message.success("Đăng ký thành công! Chào mừng bạn.");
-      router.push("/dashboard/tournament");
+      router.push("/dashboard/race-result");
     } catch (error: any) {
       message.error(error.message || "Đăng ký thất bại");
     } finally {
