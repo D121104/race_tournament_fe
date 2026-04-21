@@ -49,19 +49,19 @@ export default function RaceResultModal({
       width={500}
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item name="finalPosition" label="Vị trí về đích">
+        <Form.Item name="finalPosition" label="Vị trí về đích" rules={[{ required: true, message: "Vui lòng nhập vị trí về đích" }]}>
           <Input placeholder="Ví dụ: 1, 2, 3..." />
         </Form.Item>
 
-        <Form.Item name="time" label="Thời gian hoàn thành">
+        <Form.Item name="time" label="Thời gian hoàn thành" rules={[{ required: true, message: "Vui lòng nhập thời gian hoàn thành" }]}>
           <Input placeholder="Ví dụ: 1:30:45.123" />
         </Form.Item>
 
-        <Form.Item name="lapsCompleted" label="Số vòng hoàn thành">
+        <Form.Item name="lapsCompleted" label="Số vòng hoàn thành" rules={[{ required: true, message: "Vui lòng nhập số vòng hoàn thành" }]}>
           <Input placeholder="Ví dụ: 53" />
         </Form.Item>
 
-        <Form.Item name="status" label="Trạng thái">
+        <Form.Item name="status" label="Trạng thái" rules={[{ required: true, message: "Vui lòng chọn trạng thái" }]}>
           <Select
             options={[
               { value: "Finished", label: "Hoàn thành (Finished)" },
@@ -71,7 +71,7 @@ export default function RaceResultModal({
           />
         </Form.Item>
 
-        <Form.Item name="points" label="Điểm số">
+        <Form.Item name="points" label="Điểm số" rules={[{ required: true, message: "Vui lòng nhập điểm số" }]}>
           <InputNumber style={{ width: "100%" }} min={0} step={0.5} />
         </Form.Item>
 

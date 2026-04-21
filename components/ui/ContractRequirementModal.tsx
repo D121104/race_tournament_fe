@@ -1,33 +1,42 @@
 "use client";
 
 import React from "react";
-import { Modal, Form, Input, Select, Button } from "antd";
+import { Modal, Form, Input, Select, Button, message } from "antd";
+import { ContractRequirement } from "@/types/sponsor";
+import { contractRequirementService } from "@/services/contractRequirementService";
 
 interface ContractRequirementModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (values: any) => Promise<void>;
+  onCreated: (newRequirement: ContractRequirement) => void;
 }
 
 export default function ContractRequirementModal({
   open,
   onClose,
-  onSubmit,
+  onCreated,
 }: ContractRequirementModalProps) {
   const [form] = Form.useForm();
 
   const handleFinish = async (values: any) => {
-    await onSubmit(values);
-    form.resetFields();
+    try {
+      const newReq = await contractRequirementService.createRequirement(values);
+      message.success(`Tạo yêu cầu "${newReq.requirementName}" thành công`);
+      form.resetFields();
+      onCreated(newReq);
+    } catch (error) {
+      message.error("Không thể tạo yêu cầu");
+    }
   };
 
   return (
     <Modal
-      title="Thêm yêu cầu hợp đồng"
+      title="Tạo nhanh yêu cầu hợp đồng"
       open={open}
       onCancel={onClose}
       footer={null}
       destroyOnHidden={true}
+      width={500}
     >
       <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Form.Item
@@ -40,7 +49,7 @@ export default function ContractRequirementModal({
         <Form.Item name="description" label="Mô tả chi tiết">
           <Input.TextArea rows={3} />
         </Form.Item>
-        <Form.Item name="category" label="Danh mục">
+        <Form.Item name="category" label="Danh mục" rules={[{ required: true, message: "Vui lòng chọn danh mục" }]}>
           <Select
             placeholder="Chọn hoặc nhập danh mục"
             allowClear

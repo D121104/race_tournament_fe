@@ -4,16 +4,11 @@ import React, { useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  TrophyOutlined,
-  CalendarOutlined,
-  FlagOutlined,
   BarChartOutlined,
   DollarOutlined,
-  LogoutOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 import { useRouter, usePathname } from "next/navigation";
-import { authService } from "@/services/authService";
 
 const { Header, Sider, Content } = Layout;
 
@@ -32,7 +27,7 @@ export default function MainLayout({
 
   const getSelectedKey = () => {
     if (pathname?.includes('/dashboard/race-result')) return '1';
-    if (pathname?.includes('/dashboard/sponsor')) return '2';
+    if (pathname?.includes('/dashboard/sponsor-contract')) return '2';
     return '1';
   };
 
@@ -42,10 +37,10 @@ export default function MainLayout({
         router.push('/dashboard/race-result');
         break;
       case '2':
-        router.push('/dashboard/sponsor');
+        router.push('/dashboard/sponsor-contract');
         break;
       default:
-        router.push('/dashboard');
+        router.push('/dashboard/race-result');
     }
   };
 
@@ -73,7 +68,7 @@ export default function MainLayout({
         />
       </Sider>
       <Layout>
-        <Header style={{ padding: "0 16px", background: colorBgContainer, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Header style={{ padding: "0 16px", background: colorBgContainer, display: "flex", alignItems: "center" }}>
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
@@ -84,17 +79,6 @@ export default function MainLayout({
               height: 64,
             }}
           />
-          <Button
-            type="text"
-            danger
-            icon={<LogoutOutlined />}
-            onClick={() => {
-              authService.logout();
-              router.push("/login");
-            }}
-          >
-            Đăng xuất
-          </Button>
         </Header>
         <Content
           style={{
@@ -111,4 +95,3 @@ export default function MainLayout({
     </Layout>
   );
 }
-

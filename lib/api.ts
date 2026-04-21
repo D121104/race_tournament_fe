@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080';
 
 export class ApiError extends Error {
   constructor(
@@ -22,7 +22,7 @@ export async function apiClient<T>(
   options?: RequestInit
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   // Get auth token from localStorage
   const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
 
@@ -39,26 +39,25 @@ export async function apiClient<T>(
 
   try {
     const response = await fetch(url, config);
-    
+
     if (!response.ok) {
-      // ✅ Cải thiện error handling
       let errorData: any = {};
       try {
         const contentType = response.headers.get('content-type');
         if (contentType?.includes('application/json')) {
           errorData = await response.json();
         } else {
-          errorData = { 
+          errorData = {
             message: response.statusText || `HTTP ${response.status}`,
-            raw: await response.text().catch(() => '') 
+            raw: await response.text().catch(() => '')
           };
         }
       } catch (parseError) {
-        errorData = { 
-          message: response.statusText || `HTTP Error ${response.status}` 
+        errorData = {
+          message: response.statusText || `HTTP Error ${response.status}`
         };
       }
-      
+
       throw new ApiError(
         response.status,
         errorData?.message || `HTTP Error ${response.status}`,
@@ -66,7 +65,6 @@ export async function apiClient<T>(
       );
     }
 
-    // ✅ Safely parse JSON response
     let data: ApiResponse<T>;
     try {
       data = await response.json();
@@ -75,7 +73,7 @@ export async function apiClient<T>(
         error: parseError instanceof Error ? parseError.message : 'Parse error'
       });
     }
-    
+
     // Validate response format
     if (!data || typeof data !== 'object') {
       throw new ApiError(
@@ -84,15 +82,12 @@ export async function apiClient<T>(
         data
       );
     }
-    
-    // ✅ Backend trả về format: { code, message, result }
-    // Kiểm tra tường minh code thành công
+
     const isSuccess = data.code === 200 || data.code === 201 || data.code === 0;
     if (data.code && !isSuccess) {
       throw new ApiError(data.code, data.message || 'Server error', data);
     }
-    
-    // Ensure result exists
+
     if (!('result' in data)) {
       throw new ApiError(
         500,
@@ -100,14 +95,13 @@ export async function apiClient<T>(
         data
       );
     }
-    
+
     return data.result;
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
     }
-    
-    // Network errors or other fetch errors
+
     throw new ApiError(
       0,
       error instanceof Error ? error.message : 'Network error occurred',
@@ -118,19 +112,19 @@ export async function apiClient<T>(
 
 export const api = {
   get: <T>(endpoint: string) => apiClient<T>(endpoint, { method: 'GET' }),
-  
+
   post: <T>(endpoint: string, data?: any) =>
     apiClient<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     }),
-  
+
   put: <T>(endpoint: string, data?: any) =>
     apiClient<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     }),
-  
+
   delete: <T>(endpoint: string) =>
     apiClient<T>(endpoint, { method: 'DELETE' }),
 };

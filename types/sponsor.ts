@@ -13,13 +13,6 @@ export interface CreateSponsorRequest {
   contactPhone?: string;
 }
 
-export interface UpdateSponsorRequest {
-  sponsorName?: string;
-  industry?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-}
-
 export type SponsorContractStatus = 'DRAFT' | 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
 
 export interface ContractRequirement {
@@ -67,16 +60,3 @@ export interface CreateSponsorContractRequest {
   }[];
 }
 
-export interface UpdateSponsorContractRequest {
-  contractValue?: number;
-  startDate?: string;
-  endDate?: string;
-  status?: SponsorContractStatus;
-  terms?: string;
-  requirementIds?: number[];
-  newRequirements?: {
-    requirementName: string;
-    description?: string;
-    category?: string;
-  }[];
-}

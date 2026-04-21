@@ -1,48 +1,42 @@
 "use client";
 
 import React from "react";
-import { Modal, Form, Input, Button } from "antd";
+import { Modal, Form, Input, Button, message } from "antd";
 import { Sponsor } from "@/types/sponsor";
+import { sponsorService } from "@/services/sponsorService";
 
 interface SponsorModalProps {
   open: boolean;
-  mode: "create" | "edit";
-  editingSponsor: Sponsor | null;
   onClose: () => void;
-  onSubmit: (values: any) => Promise<void>;
+  onCreated: (newSponsor: Sponsor) => void;
 }
 
 export default function SponsorModal({
   open,
-  mode,
-  editingSponsor,
   onClose,
-  onSubmit,
+  onCreated,
 }: SponsorModalProps) {
   const [form] = Form.useForm();
 
-  React.useEffect(() => {
-    if (open) {
-      if (mode === "edit" && editingSponsor) {
-        form.setFieldsValue(editingSponsor);
-      } else {
-        form.resetFields();
-      }
-    }
-  }, [open, mode, editingSponsor, form]);
-
   const handleFinish = async (values: any) => {
-    await onSubmit(values);
-    form.resetFields();
+    try {
+      const newSponsor = await sponsorService.createSponsor(values);
+      message.success(`Tạo nhà tài trợ "${newSponsor.sponsorName}" thành công`);
+      form.resetFields();
+      onCreated(newSponsor);
+    } catch (error) {
+      message.error("Không thể tạo nhà tài trợ");
+    }
   };
 
   return (
     <Modal
-      title={mode === "create" ? "Thêm nhà tài trợ" : "Sửa nhà tài trợ"}
+      title="Tạo nhanh nhà tài trợ"
       open={open}
       onCancel={onClose}
       footer={null}
       destroyOnHidden={true}
+      width={500}
     >
       <Form form={form} layout="vertical" onFinish={handleFinish}>
         <Form.Item
@@ -52,13 +46,13 @@ export default function SponsorModal({
         >
           <Input placeholder="Ví dụ: Petronas, DHL, Rolex..." />
         </Form.Item>
-        <Form.Item name="industry" label="Lĩnh vực">
+        <Form.Item name="industry" label="Lĩnh vực" rules={[{ required: true, message: "Vui lòng nhập lĩnh vực" }]}>
           <Input placeholder="Ví dụ: Dầu khí, Logistics, Đồng hồ..." />
         </Form.Item>
-        <Form.Item name="contactEmail" label="Email liên hệ">
+        <Form.Item name="contactEmail" label="Email liên hệ" rules={[{ required: true, message: "Vui lòng nhập email" }]}>
           <Input placeholder="contact@sponsor.com" />
         </Form.Item>
-        <Form.Item name="contactPhone" label="Số điện thoại">
+        <Form.Item name="contactPhone" label="SĐT" rules={[{ required: true, message: "Vui lòng nhập SĐT" }]}>
           <Input placeholder="+84..." />
         </Form.Item>
         <div style={{ textAlign: "right" }}>
@@ -66,7 +60,7 @@ export default function SponsorModal({
             Hủy
           </Button>
           <Button type="primary" htmlType="submit">
-            {mode === "create" ? "Tạo mới" : "Cập nhật"}
+            Tạo mới
           </Button>
         </div>
       </Form>
