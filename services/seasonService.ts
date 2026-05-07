@@ -1,10 +1,6 @@
 import { api } from '@/lib/api';
 import {
   Season,
-  SeasonsResponse,
-  SeasonResponse,
-  CreateSeasonRequest,
-  UpdateSeasonRequest,
 } from '@/types/season';
 
 export const seasonService = {

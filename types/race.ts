@@ -1,6 +1,6 @@
 export interface Race {
   id: number;
-  seasonId: number;
+  seasonId?: number;
   raceName: string;
   description?: string;
   location: string;

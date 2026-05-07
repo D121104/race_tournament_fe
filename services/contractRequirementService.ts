@@ -13,7 +13,4 @@ export const contractRequirementService = {
     return api.post<ContractRequirement>('/api/contract-requirements/create', data);
   },
 
-  async deleteRequirement(id: number): Promise<void> {
-    return api.delete<void>(`/api/contract-requirements/${id}`);
-  },
 };

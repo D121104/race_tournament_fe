@@ -1,7 +1,7 @@
 export interface RaceResult {
   id: number;
-  raceId: number;
-  racerId: string;
+  raceId?: number;
+  racerId?: number;
   time: string;
   lapsCompleted: string;
   finalPosition: string;
@@ -21,10 +21,10 @@ export interface RaceResultResponse {
 
 export interface Racer {
   id: number;
-  seasonId: number;
   racerName: string;
-  gender: string;
-  nationality: string;
+  gender?: string;
+  dateOfBirth?: string;
+  nationality?: string;
 }
 
 export interface UpdateRaceResultRequest {

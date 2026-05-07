@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -18,12 +18,27 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [ready, setReady] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    setReady(true);
+  }, [router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    router.replace("/login");
+  };
 
   const getSelectedKey = () => {
     if (pathname?.includes('/dashboard/race-result')) return '1';
@@ -43,6 +58,10 @@ export default function MainLayout({
         router.push('/dashboard/race-result');
     }
   };
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -79,6 +98,9 @@ export default function MainLayout({
               height: 64,
             }}
           />
+          <div style={{ marginLeft: "auto" }}>
+            <Button onClick={handleLogout}>Logout</Button>
+          </div>
         </Header>
         <Content
           style={{

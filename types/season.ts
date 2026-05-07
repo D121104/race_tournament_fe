@@ -1,6 +1,6 @@
 export interface Season {
   id: number;
-  tournamentId: number;
+  tournamentId?: number;
   seasonName: string;
   yearOfOrganization: number;
   description?: string;

@@ -7,12 +7,17 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace("/dashboard/race-result");
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      router.replace("/dashboard/race-result");
+    } else {
+      router.replace("/login");
+    }
   }, [router]);
 
   return (
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-      <p>Đang chuyển hướng...</p>
+      <p>Redirecting...</p>
     </div>
   );
 }
