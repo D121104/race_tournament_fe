@@ -8,7 +8,7 @@ interface RaceResultModalProps {
   open: boolean;
   data: RaceResultResponse | null;
   onClose: () => void;
-  onSubmit: (resultId: number, values: UpdateRaceResultRequest) => Promise<void>;
+  onSubmit: (values: UpdateRaceResultRequest) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -35,7 +35,8 @@ export default function RaceResultModal({
 
   const handleSubmit = async (values: any) => {
     if (!data) return;
-    await onSubmit(data.id, values);
+    values.id = data.id;
+    await onSubmit(values);
     form.resetFields();
   };
 

@@ -10,7 +10,7 @@ import { RaceResultResponse, UpdateRaceResultRequest } from "@/types/raceResult"
 interface RaceResultTableProps {
   results: RaceResultResponse[];
   loading: boolean;
-  onUpdateResult: (resultId: number, values: UpdateRaceResultRequest) => Promise<void>;
+  onUpdateResult: (values: UpdateRaceResultRequest) => Promise<void>;
 }
 
 export default function RaceResultTable({
@@ -27,10 +27,10 @@ export default function RaceResultTable({
     setModalOpen(true);
   };
 
-  const handleSubmit = async (resultId: number, values: UpdateRaceResultRequest) => {
+  const handleSubmit = async (values: UpdateRaceResultRequest) => {
     setSubmitting(true);
     try {
-      await onUpdateResult(resultId, values);
+      await onUpdateResult( values);
       setModalOpen(false);
     } catch (error) {
       console.error("Update error:", error);

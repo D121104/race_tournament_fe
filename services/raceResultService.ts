@@ -13,8 +13,8 @@ export const raceResultService = {
   },
 
   // POST /api/race-results/update/{resultId} - Cập nhật 1 kết quả
-  async updateResult(resultId: number, data: UpdateRaceResultRequest): Promise<RaceResult> {
-    return api.post<RaceResult>(`/api/race-results/update/${resultId}`, data);
+  async updateResult(data: UpdateRaceResultRequest): Promise<RaceResult> {
+    return api.post<RaceResult>(`/api/race-results/update`, data);
   },
 
   // POST /api/race-results/race/{raceId}/batch-update - Cập nhật hàng loạt kết quả

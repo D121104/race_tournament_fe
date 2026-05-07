@@ -28,6 +28,7 @@ export interface Racer {
 }
 
 export interface UpdateRaceResultRequest {
+  id: number;
   time?: string;
   lapsCompleted?: string;
   finalPosition?: string;
